@@ -12,7 +12,7 @@
     "properties": {
         "prompt": {
             "type": "string",
-            "description": "Instruction given to the model."
+            "description": "Instruction describing the desired musical output."
         },
         "output": {
             "$ref": "#/$defs/output"
@@ -40,7 +40,7 @@
                 },
                 "progression_data": {
                     "type": "array",
-                    "description": "The progression, consisting of chord items or shared references.",
+                    "description": "The progression, consisting of chords, chord groups, and shared references.",
                     "items": {
                         "$ref": "#/$defs/chordItem"
                     }
@@ -52,7 +52,8 @@
             "description": "Metadata describing the musical output.",
             "required": [
                 "bpm",
-                "signature"
+                "signature",
+                "scale"
             ],
             "additionalProperties": false,
             "properties": {
@@ -63,7 +64,7 @@
                 },
                 "signature": {
                     "type": "array",
-                    "description": "Time signature as [numerator, denominator].",
+                    "description": "Time signature represented as [numerator, denominator].",
                     "prefixItems": [
                         {
                             "type": "integer",
@@ -76,6 +77,11 @@
                     ],
                     "minItems": 2,
                     "maxItems": 2
+                },
+                "scale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Musical scale or mode, such as C major or A Dorian."
                 }
             }
         },
@@ -114,18 +120,21 @@
                 "chords"
             ],
             "additionalProperties": false,
+            "description": "A progression unit containing multiple chords divided into equal subdivisions.",
             "properties": {
                 "chords": {
                     "type": "array",
+                    "description": "Chords occupying equal subdivisions of the progression unit.",
                     "minItems": 1,
                     "items": {
-                        "$ref": "#/$defs/chordItem"
+                        "$ref": "#/$defs/chord"
                     }
                 }
             }
         },
         "sharedReference": {
             "type": "object",
+            "description": "A reference to a named reusable musical structure.",
             "required": [
                 "shared"
             ],

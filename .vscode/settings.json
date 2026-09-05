@@ -1,0 +1,11 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "data/*.json",
+                "data/*.jsonl"
+            ],
+            "url": "/chord-gen.schema.json"
+        }
+    ]
+}
