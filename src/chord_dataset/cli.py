@@ -323,6 +323,7 @@ def dedupe(source: Path, destination: Path | None) -> None:
     """Find and optionally remove exact duplicate records."""
     result = dedupe_file(source)
 
+    click.echo("Exact duplicates found")
     click.echo(f"Records: {result.records}")
     click.echo(f"Unique records: {result.unique_records}")
     click.echo(f"Duplicate records: {result.duplicate_records}")
@@ -334,7 +335,8 @@ def dedupe(source: Path, destination: Path | None) -> None:
 
     if destination is not None:
         write_deduplicated(source, destination)
-        click.echo(f"Wrote deduplicated dataset to {destination}")
+        click.echo(f"Deduplicated dataset written to {destination}")
+        click.echo(f"Records written: {result.unique_records}")
 
 
 @main.command("dedupe-prompts")
