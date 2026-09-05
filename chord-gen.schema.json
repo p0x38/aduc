@@ -41,6 +41,7 @@
                 "progression_data": {
                     "type": "array",
                     "description": "The progression, consisting of chords, chord groups, and shared references.",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/$defs/chordItem"
                     }
@@ -59,7 +60,7 @@
             "properties": {
                 "bpm": {
                     "type": "number",
-                    "exclusiveMinimum": 0,
+                    "minimum": 1,
                     "description": "Tempo in beats per minute."
                 },
                 "signature": {
