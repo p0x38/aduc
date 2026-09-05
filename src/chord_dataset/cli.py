@@ -6,7 +6,7 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from .audit import audit_file
+from .audit import audit_file, format_diagnostic
 from .convert import convert_jsonl
 from .dedupe import (
     dedupe_file,
@@ -64,7 +64,14 @@ def audit(path: Path) -> None:
         console.print()
         console.print("[yellow]Issues[/yellow]")
         for issue in result.issues:
-            console.print(f"  line {issue.line_number}: {issue.message}")
+            console.print(
+                format_diagnostic(
+                    path,
+                    line=issue.line_number,
+                    column=1,
+                    message=issue.message,
+                )
+            )
 
     if result.duplicates.groups:
         console.print()
@@ -141,13 +148,27 @@ def stats(path: Path) -> None:
 @main.command()
 @click.argument("path", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
-@click.option("--train-ratio", type=click.FloatRange(min=0.0, max=1.0), default=0.8, show_default=True)
-@click.option("--validation-ratio", type=click.FloatRange(min=0.0, max=1.0), default=0.1, show_default=True)
+@click.option(
+    "--train-ratio",
+    type=click.FloatRange(min=0.0, max=1.0),
+    default=0.8,
+    show_default=True,
+)
+@click.option(
+    "--validation-ratio",
+    type=click.FloatRange(min=0.0, max=1.0),
+    default=0.1,
+    show_default=True,
+)
 @click.option("--seed", type=int, default=42, show_default=True)
-def split(path: Path, output_dir: Path, train_ratio: float, validation_ratio: float, seed: int) -> None:
+def split(
+    path: Path, output_dir: Path, train_ratio: float, validation_ratio: float, seed: int
+) -> None:
     """Split a JSONL dataset into train, validation, and test sets."""
     try:
-        dataset = load_and_split(path, train_ratio=train_ratio, validation_ratio=validation_ratio, seed=seed)
+        dataset = load_and_split(
+            path, train_ratio=train_ratio, validation_ratio=validation_ratio, seed=seed
+        )
         write_split(dataset, output_dir)
     except ValueError as exc:
         raise click.ClickException(str(exc)) from exc
@@ -191,11 +212,21 @@ def normalize(source: Path, destination: Path) -> None:
 @main.command()
 @click.argument("source", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("destination", type=click.Path(dir_okay=False, path_type=Path))
-@click.option("--format", "output_format", type=click.Choice([output_format.value for output_format in OutputFormat], case_sensitive=False), default=OutputFormat.STRUCTURED.value, show_default=True)
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(
+        [output_format.value for output_format in OutputFormat], case_sensitive=False
+    ),
+    default=OutputFormat.STRUCTURED.value,
+    show_default=True,
+)
 def convert(source: Path, destination: Path, output_format: str) -> None:
     """Convert a dataset into a training-oriented JSONL format."""
     try:
-        result = convert_jsonl(source, destination, output_format=OutputFormat(output_format.lower()))
+        result = convert_jsonl(
+            source, destination, output_format=OutputFormat(output_format.lower())
+        )
     except ValidationError as exc:
         raise click.ClickException(str(exc)) from exc
     console.print("[green]✓ Dataset converted successfully[/green]")
@@ -206,7 +237,13 @@ def convert(source: Path, destination: Path, output_format: str) -> None:
 
 @main.command()
 @click.argument("source", type=click.Path(exists=True, dir_okay=False, path_type=Path))
-@click.option("--write", "destination", type=click.Path(dir_okay=False, path_type=Path), default=None, help="Write the deduplicated dataset to this file.")
+@click.option(
+    "--write",
+    "destination",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Write the deduplicated dataset to this file.",
+)
 def dedupe(source: Path, destination: Path | None) -> None:
     """Find and optionally remove exact duplicate records."""
     result = dedupe_file(source)
