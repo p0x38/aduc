@@ -1,0 +1,14 @@
+target-version = "py312"
+line-length = 88
+exclude = [
+    ".history",
+    ".git",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "N", "ANN"]

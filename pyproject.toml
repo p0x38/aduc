@@ -1,0 +1,31 @@
+[project]
+name = "chord-dataset"
+version = "0.1.0"
+description = "Utilities for validating and processing chord progression datasets"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "click>=8.2,<9",
+    "pydantic>=2.11,<3",
+    "rich>=14,<15",
+]
+
+[project.scripts]
+chord-dataset = "chord_dataset.cli:main"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.17,<2",
+    "pytest>=8,<9",
+    "ruff>=0.12,<1",
+]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chord_dataset"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
